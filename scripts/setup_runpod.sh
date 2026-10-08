@@ -4,8 +4,6 @@ set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="$PROJECT_DIR/.venv"
-SOURCE_MODEL_DIR="$PROJECT_DIR/models/hf_baseline_source"
-MIGRATED_MODEL_DIR="$PROJECT_DIR/models/hf_baseline_migrated"
 
 if ! command -v python >/dev/null 2>&1; then
   echo "Python is not installed on this Pod. Use a RunPod PyTorch Pod image."
@@ -22,8 +20,7 @@ python -m pip install \
   "lerobot==0.4.4" \
   "gymnasium==1.4.0" \
   "gym-pusht==0.1.6" \
-  "pymunk==6.11.1" \
-  "huggingface_hub"
+  "pymunk==6.11.1"
 
 python - <<'PY'
 import pymunk
@@ -37,18 +34,7 @@ print(f"CUDA ready: {torch.cuda.get_device_name(0)}")
 print(f"Pymunk ready: {pymunk.version}")
 PY
 
-if [ ! -f "$MIGRATED_MODEL_DIR/policy_preprocessor.json" ]; then
-  if [ ! -f "$SOURCE_MODEL_DIR/model.safetensors" ]; then
-    echo "Downloading the Hugging Face baseline model (about 1 GB)..."
-    hf download lerobot/diffusion_pusht --local-dir "$SOURCE_MODEL_DIR"
-  fi
-
-  echo "Converting the model to the LeRobot 0.4.4 format (one-time step)..."
-  python -m lerobot.processor.migrate_policy_normalization \
-    --pretrained-path "$SOURCE_MODEL_DIR" \
-    --output-dir "$MIGRATED_MODEL_DIR"
-fi
-
 echo
-echo "Setup complete. Run:"
-echo "  bash scripts/eval_hf_baseline.sh 2"
+echo "Setup complete. The CNN checkpoints come from Git."
+echo "To evaluate the optional Hugging Face diffusion baseline later, run:"
+echo "  bash scripts/download_hf_baseline.sh"

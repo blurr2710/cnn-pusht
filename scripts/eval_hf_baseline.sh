@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run the official Hugging Face diffusion baseline on the CUDA Pod.
+# Run the optional Hugging Face diffusion baseline on the CUDA Pod.
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -17,12 +17,13 @@ if [ ! -x "$PROJECT_DIR/.venv/bin/python" ]; then
 fi
 
 if [ ! -f "$MODEL_DIR/policy_preprocessor.json" ]; then
-  echo "Baseline model is not ready. First run: bash scripts/setup_runpod.sh"
+  echo "Baseline model is not ready. First run: bash scripts/download_hf_baseline.sh"
   exit 1
 fi
 
 cd "$PROJECT_DIR"
 time "$PROJECT_DIR/.venv/bin/python" evals/eval_hf_baseline.py \
+  --policy hf \
   --episodes "$EPISODES" \
   --device cuda \
   --model-dir "$MODEL_DIR"
