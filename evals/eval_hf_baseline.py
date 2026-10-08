@@ -20,17 +20,31 @@ from lerobot.utils.transition import move_state_dict_to_device
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MODEL_DIR = ROOT / "models" / "lerobot_diffusion_pusht_0p4"
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+MODEL_NAME = "lerobot_diffusion_pusht_0p4"
 DEFAULT_OUTPUT = Path(__file__).resolve().parent / "results" / "hf_baseline_eval.json"
 MAX_STEPS = 300
 
 
-def load_policy(device):
+def find_model_dir():
+    """Find the downloaded Hugging Face model in either supported project layout."""
+    candidates = [
+        PROJECT_DIR / "models" / MODEL_NAME,
+        PROJECT_DIR / "models",
+        ROOT / "models" / MODEL_NAME,
+    ]
+    for directory in candidates:
+        if (directory / "config.json").is_file():
+            return directory
+    return candidates[0]
+
+
+def load_policy(model_dir, device):
     """Load the already-downloaded Hugging Face PushT policy."""
-    config = PreTrainedConfig.from_pretrained(MODEL_DIR)
+    config = PreTrainedConfig.from_pretrained(model_dir)
     config.device = device
-    preprocessor, postprocessor = make_pre_post_processors(config, pretrained_path=MODEL_DIR)
-    policy = DiffusionPolicy.from_pretrained(MODEL_DIR, config=config)
+    preprocessor, postprocessor = make_pre_post_processors(config, pretrained_path=model_dir)
+    policy = DiffusionPolicy.from_pretrained(model_dir, config=config)
     policy.to(device)
     policy.eval()
     return policy, preprocessor, postprocessor
@@ -78,6 +92,11 @@ def main():
         default="cpu",
         help="Where to run the model: cuda for an NVIDIA GPU, mps for an Apple GPU, or cpu.",
     )
+    parser.add_argument(
+        "--model-dir",
+        type=Path,
+        help="Folder holding config.json and model.safetensors. Defaults to common local locations.",
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     args = parser.parse_args()
 
@@ -87,10 +106,14 @@ def main():
         raise SystemExit("MPS is not available on this machine; use --device cpu")
     if args.device == "cuda" and not torch.cuda.is_available():
         raise SystemExit("CUDA is not available on this machine; use --device cpu or mps")
-    if not MODEL_DIR.is_dir():
-        raise SystemExit(f"Model folder not found: {MODEL_DIR}")
+    model_dir = args.model_dir or find_model_dir()
+    if not model_dir.is_dir():
+        raise SystemExit(
+            "Hugging Face model folder not found. Expected either "
+            f"{PROJECT_DIR / 'models' / MODEL_NAME} or {ROOT / 'models' / MODEL_NAME}"
+        )
 
-    policy, preprocessor, postprocessor = load_policy(args.device)
+    policy, preprocessor, postprocessor = load_policy(model_dir, args.device)
     env = gym.make("gym_pusht/PushT-v0", obs_type="pixels_agent_pos")
     results = []
     try:
@@ -109,7 +132,7 @@ def main():
 
     successes = sum(result["success"] for result in results)
     report = {
-        "model": str(MODEL_DIR),
+        "model": str(model_dir),
         "device": args.device,
         "episode_count": args.episodes,
         "first_seed": args.seed,
