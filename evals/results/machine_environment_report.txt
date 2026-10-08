@@ -1,0 +1,43 @@
+Machine/environment report
+=========================
+Generated: 2026-10-08T12:23:12+00:00
+Hostname: 8e5d61fb1f5a
+
+GPU
+---
+Field "cuda_version" is not a valid field to query.
+
+Thu Oct  8 12:23:12 2026       
++-----------------------------------------------------------------------------------------+
+| NVIDIA-SMI 610.43.02              KMD Version: 610.43.02     CUDA UMD Version: 13.3     |
++-----------------------------------------+------------------------+----------------------+
+| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp   Perf          Pwr:Usage/Cap |           Memory-Usage | GPU-Util  Compute M. |
+|                                         |                        |               MIG M. |
+|=========================================+========================+======================|
+|   0  NVIDIA GeForce RTX 3090        On  |   00000000:C1:00.0 Off |                  N/A |
+| 30%   26C    P8             19W /  350W |       1MiB /  24576MiB |      0%      Default |
+|                                         |                        |                  N/A |
++-----------------------------------------+------------------------+----------------------+
+
++-----------------------------------------------------------------------------------------+
+| Processes:                                                                              |
+|  GPU   GI   CI              PID   Type   Process name                        GPU Memory |
+|        ID   ID                                                               Usage      |
+|=========================================================================================|
+|  No running processes found                                                             |
++-----------------------------------------------------------------------------------------+
+
+CUDA / Python / Torch
+-----------------------
+Python: 3.12.3 (main, Nov  6 2025, 13:44:16) [GCC 13.3.0]
+torch: 2.9.1+cu128
+Torch CUDA compiled: 12.8
+Torch CUDA available: True
+Torch GPU: NVIDIA GeForce RTX 3090
+
+Repository
+----------
+Path: /workspace/cnn-pusht
+Branch: main
+Remote: https://github.com/blurr2710/cnn-pusht.git

@@ -1,0 +1,26 @@
+device: cuda
+weights : models/pusht_cnn_mlp_v1.pt
+parameters: 839,426
+game  1/20 (seed 1000)  no success  final coverage 0.015  best coverage 0.015  steps 300
+game  2/20 (seed 1001)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game  3/20 (seed 1002)  no success  final coverage 0.039  best coverage 0.039  steps 300
+game  4/20 (seed 1003)  no success  final coverage 0.101  best coverage 0.101  steps 300
+game  5/20 (seed 1004)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game  6/20 (seed 1005)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game  7/20 (seed 1006)  no success  final coverage 0.137  best coverage 0.139  steps 300
+game  8/20 (seed 1007)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game  9/20 (seed 1008)  no success  final coverage 0.003  best coverage 0.003  steps 300
+game 10/20 (seed 1009)  no success  final coverage 0.262  best coverage 0.262  steps 300
+game 11/20 (seed 1010)  no success  final coverage 0.080  best coverage 0.080  steps 300
+game 12/20 (seed 1011)  no success  final coverage 0.032  best coverage 0.032  steps 300
+game 13/20 (seed 1012)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game 14/20 (seed 1013)  no success  final coverage 0.000  best coverage 0.212  steps 300
+game 15/20 (seed 1014)  no success  final coverage 0.451  best coverage 0.451  steps 300
+game 16/20 (seed 1015)  no success  final coverage 0.299  best coverage 0.299  steps 300
+game 17/20 (seed 1016)  no success  final coverage 0.036  best coverage 0.036  steps 300
+game 18/20 (seed 1017)  no success  final coverage 0.022  best coverage 0.022  steps 300
+game 19/20 (seed 1018)  no success  final coverage 0.000  best coverage 0.000  steps 300
+game 20/20 (seed 1019)  no success  final coverage 0.000  best coverage 0.000  steps 300
+
+summary: success 0/20  mean best coverage 0.085  mean steps 300
+(success = >=95% of the T-block inside the goal zone within 300 steps)

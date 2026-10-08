@@ -1,0 +1,171 @@
+{
+  "model": "models/hf_baseline_migrated",
+  "device": "cuda",
+  "episode_count": 20,
+  "first_seed": 1000,
+  "success_rate_percent": 75.0,
+  "successes": 15,
+  "mean_best_coverage": 0.9181316139053812,
+  "episodes": [
+    {
+      "seed": 1000,
+      "success": true,
+      "steps": 145,
+      "final_coverage": 0.9527462885862187,
+      "best_coverage": 0.9527462885862187,
+      "total_reward": 34.78145681034265
+    },
+    {
+      "seed": 1001,
+      "success": false,
+      "steps": 300,
+      "final_coverage": 0.27929143609640056,
+      "best_coverage": 0.27929143609640056,
+      "total_reward": 28.978790999899367
+    },
+    {
+      "seed": 1002,
+      "success": false,
+      "steps": 300,
+      "final_coverage": 0.7375948077434542,
+      "best_coverage": 0.9408588232340077,
+      "total_reward": 231.5358325037659
+    },
+    {
+      "seed": 1003,
+      "success": true,
+      "steps": 127,
+      "final_coverage": 0.973554669685877,
+      "best_coverage": 0.973554669685877,
+      "total_reward": 89.4537376285353
+    },
+    {
+      "seed": 1004,
+      "success": true,
+      "steps": 162,
+      "final_coverage": 0.9519302528003111,
+      "best_coverage": 0.9519302528003111,
+      "total_reward": 61.42903364657312
+    },
+    {
+      "seed": 1005,
+      "success": true,
+      "steps": 230,
+      "final_coverage": 0.9545659951498138,
+      "best_coverage": 0.9545659951498138,
+      "total_reward": 75.07389259840204
+    },
+    {
+      "seed": 1006,
+      "success": true,
+      "steps": 166,
+      "final_coverage": 0.9508471242781844,
+      "best_coverage": 0.9508471242781844,
+      "total_reward": 75.02714167238106
+    },
+    {
+      "seed": 1007,
+      "success": true,
+      "steps": 160,
+      "final_coverage": 0.9542559118258936,
+      "best_coverage": 0.9542559118258936,
+      "total_reward": 100.36124210933889
+    },
+    {
+      "seed": 1008,
+      "success": true,
+      "steps": 243,
+      "final_coverage": 0.9506714092169668,
+      "best_coverage": 0.9506714092169668,
+      "total_reward": 111.88923451415974
+    },
+    {
+      "seed": 1009,
+      "success": true,
+      "steps": 136,
+      "final_coverage": 0.9755888359108044,
+      "best_coverage": 0.9755888359108044,
+      "total_reward": 42.37310944157278
+    },
+    {
+      "seed": 1010,
+      "success": true,
+      "steps": 208,
+      "final_coverage": 0.9604386289343844,
+      "best_coverage": 0.9604386289343844,
+      "total_reward": 138.89569208610197
+    },
+    {
+      "seed": 1011,
+      "success": false,
+      "steps": 300,
+      "final_coverage": 0.9078913838488228,
+      "best_coverage": 0.9143073720148248,
+      "total_reward": 89.94290802717879
+    },
+    {
+      "seed": 1012,
+      "success": true,
+      "steps": 159,
+      "final_coverage": 0.9657628845561967,
+      "best_coverage": 0.9657628845561967,
+      "total_reward": 59.872901928805064
+    },
+    {
+      "seed": 1013,
+      "success": true,
+      "steps": 129,
+      "final_coverage": 0.9596748006523715,
+      "best_coverage": 0.9596748006523715,
+      "total_reward": 29.420605989492916
+    },
+    {
+      "seed": 1014,
+      "success": false,
+      "steps": 300,
+      "final_coverage": 0.8824196517882075,
+      "best_coverage": 0.9101876424571027,
+      "total_reward": 174.47979329198915
+    },
+    {
+      "seed": 1015,
+      "success": true,
+      "steps": 174,
+      "final_coverage": 0.9596791502205799,
+      "best_coverage": 0.9596791502205799,
+      "total_reward": 136.7395319984252
+    },
+    {
+      "seed": 1016,
+      "success": true,
+      "steps": 90,
+      "final_coverage": 0.9668256333545237,
+      "best_coverage": 0.9668256333545237,
+      "total_reward": 26.015680497480187
+    },
+    {
+      "seed": 1017,
+      "success": true,
+      "steps": 103,
+      "final_coverage": 0.9631278930675974,
+      "best_coverage": 0.9631278930675974,
+      "total_reward": 25.792444034754535
+    },
+    {
+      "seed": 1018,
+      "success": true,
+      "steps": 112,
+      "final_coverage": 0.9570652299912187,
+      "best_coverage": 0.9570652299912187,
+      "total_reward": 22.69665719920023
+    },
+    {
+      "seed": 1019,
+      "success": false,
+      "steps": 300,
+      "final_coverage": 0.8668159341740692,
+      "best_coverage": 0.9212522960743463,
+      "total_reward": 182.76244863151956
+    }
+  ]
+}
