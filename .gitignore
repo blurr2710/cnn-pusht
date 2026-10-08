@@ -5,3 +5,7 @@ __pycache__/
 # Generated evaluation output. Re-run evaluations instead of committing them.
 evals/logs/
 evals/results/
+
+# Downloaded/migrated Hugging Face baseline (about 1 GB); fetched by setup_runpod.sh.
+models/hf_baseline_source/
+models/hf_baseline_migrated/
