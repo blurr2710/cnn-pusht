@@ -50,6 +50,45 @@ class PushTCNNMLP(nn.Module):
         return self.head(joined)                # (B, 2)
 
 
+class PushTCNNMLPChunk(nn.Module):
+    """CNN + MLP policy that predicts a connected plan of future targets.
+
+    The image encoder matches :class:`PushTCNNMLP`. Only the last linear layer
+    changes: it emits ``chunk_size * 2`` values which are reshaped into
+    ``(batch, chunk_size, 2)`` absolute pusher targets in normalized space.
+    """
+
+    def __init__(self, chunk_size=8):
+        super().__init__()
+        if chunk_size < 1:
+            raise ValueError(f"chunk_size must be positive, got {chunk_size}")
+        self.chunk_size = chunk_size
+
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Conv2d(128, 128, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(),
+            nn.Flatten(),
+        )
+        self.head = nn.Sequential(
+            nn.Linear(128 * 6 * 6 + 2, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, chunk_size * 2),
+        )
+
+    def forward(self, image, state):
+        feat = self.encoder(image)
+        joined = torch.cat([feat, state], dim=1)
+        return self.head(joined).view(-1, self.chunk_size, 2)
+
+
 if __name__ == "__main__":
     # sanity check: run one fake example through the net, print shapes
     model = PushTCNNMLP()

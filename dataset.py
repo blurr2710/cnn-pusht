@@ -14,6 +14,12 @@ Data preparation:
 Usage:
     source .venv/bin/activate
     python cnn_pusht/dataset.py     # sanity check: prints one preprocessed example
+
+For chunked behavioral cloning, :class:`PushTActionChunkExample` keeps the
+same observation at time ``t`` and uses recorded actions ``t`` through
+``t + chunk_size - 1`` as its target. Starts that could run past an episode
+are deliberately excluded; action chunks are never padded or joined across
+games.
 """
 import json
 
@@ -31,6 +37,7 @@ SPLIT_FILE = "cnn_pusht/split.json"
 # i.e. around 256. (v-256)/256 maps 0..512 to (-1..1), with 256 -> 0.
 STATE_RAW_CENTER = 256.0
 STATE_RAW_RANGE = 256.0
+DEFAULT_CHUNK_SIZE = 8
 
 
 def normalize_state_action(v):
@@ -73,6 +80,85 @@ class PushTTrainExample(Dataset):
         }
 
 
+class PushTActionChunkExample(Dataset):
+    """Return one observation and a fixed-length, within-episode action plan.
+
+    ``LeRobotDataset`` stores an absolute ``index`` for every row, including
+    when it has been filtered to a subset of episodes. We build valid relative
+    starts from the episode metadata once, then fetch future actions directly
+    from its tabular data. This avoids decoding eight future video frames per
+    training example and, more importantly, makes crossing an episode boundary
+    impossible.
+    """
+
+    def __init__(self, lerobot_ds, chunk_size=DEFAULT_CHUNK_SIZE):
+        if chunk_size < 1:
+            raise ValueError(f"chunk_size must be positive, got {chunk_size}")
+        if lerobot_ds.episodes is None:
+            raise ValueError(
+                "PushTActionChunkExample requires a LeRobotDataset restricted "
+                "to explicit episode IDs."
+            )
+
+        self.ds = lerobot_ds
+        self.chunk_size = chunk_size
+
+        # The filtered HF table remains ordered by episode and retains each
+        # row's original absolute index. Map those absolute starts back to the
+        # relative index accepted by self.ds[...].
+        absolute_to_relative = {
+            int(absolute_index): relative_index
+            for relative_index, absolute_index in enumerate(self.ds.hf_dataset["index"])
+        }
+
+        self.start_indices = []
+        for episode_id in self.ds.episodes:
+            episode = self.ds.meta.episodes[episode_id]
+            first = episode["dataset_from_index"]
+            last_exclusive = episode["dataset_to_index"]
+
+            # For labels [t, ..., t + chunk_size - 1], the largest legal t is
+            # last_exclusive - chunk_size. Therefore every episode loses its
+            # final chunk_size - 1 starts (seven starts for chunk size eight).
+            for absolute_start in range(first, last_exclusive - chunk_size + 1):
+                try:
+                    self.start_indices.append(absolute_to_relative[absolute_start])
+                except KeyError as exc:
+                    raise RuntimeError(
+                        f"Episode {episode_id} row {absolute_start} was not loaded "
+                        "into the requested LeRobotDataset."
+                    ) from exc
+
+    def __len__(self):
+        return len(self.start_indices)
+
+    def __getitem__(self, idx):
+        start = self.start_indices[idx]
+        row = self.ds[start]
+
+        # Decode only the image at observation time t, with the exact same
+        # preprocessing as the one-step dataset.
+        img = row["observation.image"]
+        if img.dtype == torch.uint8:
+            img = img.float() / 255.0
+        if img.ndim == 3 and img.shape[-1] == 3:
+            img = img.permute(2, 0, 1).contiguous()
+
+        state = normalize_state_action(row["observation.state"].float())
+
+        # Actions live in the parquet table, so this slice does not decode
+        # extra videos. The valid-start construction above guarantees this
+        # whole contiguous slice belongs to the same episode.
+        raw_actions = self.ds.hf_dataset[start : start + self.chunk_size]["action"]
+        action_chunk = normalize_state_action(torch.stack(raw_actions).float())
+
+        return {
+            "image": img,                  # (3,96,96) float 0-1
+            "state": state,                # (2,)      float ~(-1..1)
+            "action": action_chunk,        # (chunk_size,2) normalized targets
+        }
+
+
 def _load_split():
     """Load the saved episode-level split."""
     try:
@@ -99,6 +185,26 @@ def create_train_eval_datasets():
     return (
         PushTTrainExample(train_ds),
         PushTTrainExample(eval_ds),
+        split,
+    )
+
+
+def create_train_eval_chunk_datasets(chunk_size=DEFAULT_CHUNK_SIZE):
+    """Build episode-safe action-chunk datasets from the saved split.
+
+    This deliberately leaves :func:`create_train_eval_datasets` unchanged for
+    the existing single-action experiment.
+    """
+    split = _load_split()
+    train_ds = LeRobotDataset(
+        REPO_ID, episodes=split["train_episode_ids"], video_backend=VIDEO_BACKEND
+    )
+    eval_ds = LeRobotDataset(
+        REPO_ID, episodes=split["eval_episode_ids"], video_backend=VIDEO_BACKEND
+    )
+    return (
+        PushTActionChunkExample(train_ds, chunk_size=chunk_size),
+        PushTActionChunkExample(eval_ds, chunk_size=chunk_size),
         split,
     )
 
