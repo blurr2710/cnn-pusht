@@ -1,0 +1,7 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Generated evaluation output. Re-run evaluations instead of committing them.
+evals/logs/
+evals/results/
